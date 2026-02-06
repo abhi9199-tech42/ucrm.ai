@@ -171,7 +171,7 @@ with col2:
     ratio_str = ""
     if orig_size > 0:
         ratio = (1 - (comp_size / orig_size)) * 100
-        ratio_str = f"-{ratio:.1f}%"
+        ratio_str = f"{ratio:.1f}%"
     
     if orig_size > 0:
         st.metric(label="Compression Ratio", value=f"{ratio_str}", delta=f"{orig_size}B → {comp_size}B")
