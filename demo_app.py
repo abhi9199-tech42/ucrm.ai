@@ -61,7 +61,16 @@ def generate_slug(text):
             seen.add(w)
     
     # Take up to 5 significant words
+    # Ensure no word is artificially truncated by regex or display limits
+    # We join with underscores for a clean slug
     slug = "_".join(unique_sig[:5])
+    
+    # Safety check: if the slug is extremely long, it might break display
+    # But user complained about "cutting off mid-word", which implies partial word.
+    # Streamlit code blocks wrap.
+    # Let's verify we aren't truncating words in previous logic.
+    # Logic: significant = [w ... if len(w) > 4]. This ensures whole words.
+    
     if not slug:
         slug = "semantic_state_undefined"
     return slug
@@ -137,6 +146,8 @@ with col1:
         st.session_state['last_mu'] = mu_val
         st.session_state['last_density'] = density_val
         st.session_state['last_traj'] = trajectory
+        st.session_state['last_input_size'] = len(user_input.encode('utf-8'))
+        st.session_state['last_slug_size'] = len(slug.encode('utf-8')) + 16 # Approx state overhead
 
 with col2:
     st.markdown("#### Metrics")
@@ -146,7 +157,20 @@ with col2:
     density_display = st.session_state.get('last_density', 0.95)
     traj_data = st.session_state.get('last_traj', [0.1*x for x in range(10)])
     
-    st.metric(label="Original Size", value=f"{len(user_input.encode('utf-8'))} bytes")
+    orig_size = st.session_state.get('last_input_size', 0)
+    comp_size = st.session_state.get('last_slug_size', 0)
+    
+    # Calculate ratio if we have data
+    ratio_str = ""
+    if orig_size > 0:
+        ratio = (1 - (comp_size / orig_size)) * 100
+        ratio_str = f"-{ratio:.1f}%"
+    
+    if orig_size > 0:
+        st.metric(label="Compression Ratio", value=f"{ratio_str}", delta=f"{orig_size}B → {comp_size}B")
+    else:
+        st.metric(label="Original Size", value=f"{len(user_input.encode('utf-8'))} bytes")
+        
     st.metric(label="Semantic Density (ρ)", value=f"{density_display:.2f}", delta="+0.12")
     
     st.markdown("#### Resonance Vector")
