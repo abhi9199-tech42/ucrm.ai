@@ -53,12 +53,16 @@ class URCMTheory:
         """
         Operationalizes System Resonance (mu).
         
-        mu = rho / (chi + epsilon)
+        mu = rho / (1 + chi)
         High resonance is achieved when high information purity (rho) is reached 
         at low computational/transformation cost (chi).
+        
+        Bounded to [0, 1] range.
         """
-        epsilon = 1e-6
-        return rho / (chi + epsilon)
+        # Modified to ensure range [0, 1]
+        # Old formula: rho / (chi + epsilon) -> unbounded
+        # New formula: rho / (1.0 + chi) -> bounded [0, 1] assuming rho <= 1
+        return rho / (1.0 + chi)
 
 class ResonantLearning:
     """

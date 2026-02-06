@@ -44,11 +44,11 @@ class MuConvergenceEngine:
         
         if state.rho_density == 0.0 and state.chi_cost == 0.0:
             rho = URCMTheory.calculate_rho(state.resonance_vector)
-            # For chi, we need previous state. If standalone, chi is norm (energy).
-            chi = np.linalg.norm(state.resonance_vector)
+            # For initial state (no transition), cost is 0
+            chi = 0.0
             mu = URCMTheory.compute_mu(rho, chi)
             
-            # stability = mu * (1 + trivial_smoothness) - we can refine this later
+            # stability = mu
             stability = mu 
             
             # Return new state with computed metrics

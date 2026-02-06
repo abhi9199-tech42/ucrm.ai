@@ -73,6 +73,9 @@ with col1:
                 if mu_val < 0.1: 
                     mu_val = 0.95 + np.random.normal(0, 0.02)
                     density_val = 0.92 + np.random.normal(0, 0.02)
+                
+                # Clamp mu to [0, 1] range to prevent bugs
+                mu_val = max(0.0, min(1.0, mu_val))
                     
                 trajectory = result_path.mu_trajectory
                 # Ensure trajectory has data
